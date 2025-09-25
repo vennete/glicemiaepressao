@@ -14,6 +14,7 @@ def registrar():
 
     # captura IP real do usuário (Render pode usar X-Forwarded-For)
     ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+    ip_real = ip.split(",")[0].strip()
 
     # data/hora UTC
     hora = datetime.utcnow().isoformat()
