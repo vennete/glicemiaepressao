@@ -1,30 +1,11 @@
-from flask import Flask, request
-from datetime import datetime
+import requests
 
-app = Flask(__name__)
-
-@app.route("/")
-def home():
-    return "API genérica rodando 🚀 — use /registrar?var1=abc&var2=def..."
-
-@app.route("/registrar", methods=["GET"])
+@app.route("/registrar")
 def registrar():
-    # pega todos os parâmetros passados na URL
     params = request.args.to_dict()
+    params["ip"] = request.headers.get("X-Forwarded-For", request.remote_addr)
 
-    # captura IP real do usuário (Render pode usar X-Forwarded-For)
-    ip = request.headers.get("X-Forwarded-For", request.remote_addr)
-    ip_real = ip.split(",")[0].strip()
+    url = "https://script.google.com/macros/s/SEU_SCRIPT_ID/exec"
+    r = requests.get(url, params=params)
 
-    # data/hora UTC
-    hora = datetime.utcnow().isoformat()
-
-    # adiciona ip e hora ao dicionário
-    params["ip"] = ip
-    params["hora"] = hora
-
-    # log no console do servidor (aparece nos logs do Render)
-    print(f"[{hora}] IP={ip}, PARAMS={params}")
-
-    # retorna JSON
-    return params
+    return r.text
