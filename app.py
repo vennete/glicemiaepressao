@@ -1,4 +1,4 @@
-import requirementes
+import requests
 
 @app.route("/registrar")
 def registrar():
