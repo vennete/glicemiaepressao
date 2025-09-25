@@ -3,22 +3,27 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-@app.route("/registrar", methods=["GET"])
-def registrar():
-    usuario = request.args.get("usuario")
-    tipo = request.args.get("tipo")
-    valor = request.args.get("valor")
-    ip = request.remote_addr
-    hora = datetime.utcnow().isoformat()
-
-    print(f"[{hora}] IP={ip}, Usuario={usuario}, Tipo={tipo}, Valor={valor}")
-
-    # grava num arquivo CSV simples (ou outro)
-    with open("registros.csv", "a", encoding="utf-8") as f:
-        f.write(f"{hora},{ip},{usuario},{tipo},{valor}\n")
-
-    return {"status": "ok"}
-
 @app.route("/")
 def home():
-    return "Server está ativo"
+    return "API genérica rodando 🚀 — use /registrar?var1=abc&var2=def..."
+
+@app.route("/registrar", methods=["GET"])
+def registrar():
+    # pega todos os parâmetros passados na URL
+    params = request.args.to_dict()
+
+    # captura IP real do usuário (Render pode usar X-Forwarded-For)
+    ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+
+    # data/hora UTC
+    hora = datetime.utcnow().isoformat()
+
+    # adiciona ip e hora ao dicionário
+    params["ip"] = ip
+    params["hora"] = hora
+
+    # log no console do servidor (aparece nos logs do Render)
+    print(f"[{hora}] IP={ip}, PARAMS={params}")
+
+    # retorna JSON
+    return params
